@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/asn1"
 	"fmt"
 	"net"
 	"os"
@@ -9,7 +10,7 @@ import (
 
 func main() {
 	service := ":1200"
-	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
+	tcpAddr, err := net.ResolveTCPAddr("tcp", service)
 	checkError(err)
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
@@ -21,8 +22,9 @@ func main() {
 			continue
 		}
 
-		daytime := time.Now().String()
-		conn.Write([]byte(daytime))
+		daytime := time.Now()
+		mdata, _ := asn1.Marshal(daytime)
+		conn.Write(mdata)
 		conn.Close()
 	}
 }
